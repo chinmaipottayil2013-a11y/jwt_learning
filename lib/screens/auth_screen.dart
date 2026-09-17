@@ -16,7 +16,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final AuthService _service = AuthService();
   bool isLoading = false;
   String? error;
-  bool _obscureText = false;
+  bool _obscureText = true;
 
   void togglePassword() {
     setState(() {
@@ -51,37 +51,99 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Authentication'), centerTitle: true),
-      body: Column(
-        children: [
-          TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelText: 'Username',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          TextField(
-            obscureText: _obscureText,
-            controller: passwordController,
-            decoration: InputDecoration(
-              suffixIcon: IconButton(
-                onPressed: () {
-                  togglePassword();
-                },
-                icon: Icon(
-                  _obscureText ? Icons.visibility_off : Icons.visibility,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Icon(Icons.lock_outline, size: 50),
+                const SizedBox(height: 10),
+                Text(
+                  'Welcome back',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 24),
                 ),
-              ),
-              labelText: 'Password',
-              border: OutlineInputBorder(),
+                const SizedBox(height: 32),
+                TextField(
+                  controller: emailController,
+                  decoration: InputDecoration(
+                    labelText: 'Username',
+                    labelStyle: TextStyle(fontSize: 14),
+                    prefixIcon: const Icon(Icons.person_outline, size: 18),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: Colors.black26),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: Colors.black26),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: Colors.black26),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: passwordController,
+                  obscureText: _obscureText,
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                    labelStyle: TextStyle(fontSize: 14),
+                    prefixIcon: const Icon(Icons.lock_outline, size: 18),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: Colors.black26),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: Colors.black26),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                      borderSide: BorderSide(color: Colors.black26),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: togglePassword,
+                      icon: Icon(
+                        size: 20,
+                        _obscureText ? Icons.visibility_off : Icons.visibility,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (error != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Text(
+                      error!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 48,
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: _handleLogin,
+                          child: const Text('Login'),
+                        ),
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 15),
-          if (error != null) Text(error!, style: TextStyle(color: Colors.red)),
-          isLoading
-              ? const CircularProgressIndicator()
-              : ElevatedButton(onPressed: _handleLogin, child: Text('Login')),
-        ],
+        ),
       ),
     );
   }

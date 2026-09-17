@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 class ProductsAddService {
-  final String baseUri = 'https://dummyjson.com/products/add';
+  final String baseUri = 'https://dadishaapi.kodhatch.com/api/admin/courses';
 
   Future<dynamic> addProduct(String title, double price) async {
     final prefs = await SharedPreferences.getInstance();
