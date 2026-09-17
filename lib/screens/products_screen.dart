@@ -24,6 +24,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     Navigator.pop(context, newProduct);
   }
 
+
   @override
   void dispose() {
     super.dispose();
