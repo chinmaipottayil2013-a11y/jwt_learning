@@ -11,7 +11,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final AuthService _service = AuthService();
   bool isLoading = false;
@@ -30,7 +30,7 @@ class _AuthScreenState extends State<AuthScreen> {
       error = null;
     });
     final result = await _service.login(
-      usernameController.text.trim(),
+      emailController.text.trim(),
       passwordController.text.trim(),
     );
     if (!mounted) return;
@@ -54,7 +54,7 @@ class _AuthScreenState extends State<AuthScreen> {
       body: Column(
         children: [
           TextField(
-            controller: usernameController,
+            controller: emailController,
             decoration: InputDecoration(
               labelText: 'Username',
               border: OutlineInputBorder(),

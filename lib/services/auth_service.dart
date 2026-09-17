@@ -4,16 +4,16 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthService {
-  final String baseUrl = 'https://dummyjson.com/auth/login';
+  final String baseUrl = 'https://dadishaapi.kodhatch.com/api/admin/learning/login';
 
 
-  Future<String?> login(String username, String password) async {
+  Future<String?> login(String email, String password) async {
     try {
       final response = await http.post(Uri.parse(baseUrl),
           headers: {
             'Content-Type': 'application/json'
           },
-          body: jsonEncode({'username': username, 'password': password})
+          body: jsonEncode({'username':email, 'password': password})
       );
       if(response.statusCode==200){
         final data=jsonDecode(response.body);
