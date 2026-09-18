@@ -108,17 +108,19 @@ class _ProductsScreenState extends State<ProductsScreen> {
               decoration: _decoration('Product name'),
             ),
             const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              style: TextStyle(
-                fontWeight: FontWeight.normal,
-                color: Colors.black,
+            SizedBox(
+              child: DropdownButtonFormField<String>(
+                style: TextStyle(
+                  fontWeight: FontWeight.normal,
+                  color: Colors.black,
+                ),
+                initialValue: selectedType,
+                decoration: _decoration('Type'),
+                items: types
+                    .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                    .toList(),
+                onChanged: (value) => setState(() => selectedType = value),
               ),
-              initialValue: selectedType,
-              decoration: _decoration('Type'),
-              items: types
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                  .toList(),
-              onChanged: (value) => setState(() => selectedType = value),
             ),
             const SizedBox(height: 16),
             TextField(
