@@ -1,63 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_learning/providers/product_provider.dart';
 import 'package:jwt_learning/screens/auth_screen.dart';
 import 'package:jwt_learning/screens/products_screen.dart';
 import 'package:jwt_learning/services/auth_service.dart';
-import 'package:jwt_learning/services/products_service.dart';
-import 'package:jwt_learning/services/search_service.dart';
+import 'package:provider/provider.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final ProductsService _productsService = ProductsService();
-  final SearchService _searchService = SearchService();
-  final AuthService _authService = AuthService();
-  final searchController = TextEditingController();
-  List<dynamic> products = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    loadProducts();
-  }
-
-  Future<void> loadProducts() async {
-    try {
-      final data = await _productsService.getProducts();
-      setState(() {
-        products = data;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<void> searchProducts() async {
-    final query = searchController.text;
-    final result = await _searchService.searchProducts(query);
-    setState(() {
-      products = result;
-    });
-    searchController.clear();
-  }
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
-
-  Future<void> logout() async {
-    await _authService.logout();
-    if (!mounted) return;
+  Future<void> _logout(BuildContext context) async {
+    await AuthService().logout();
+    if (!context.mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (builder) => const AuthScreen()),
@@ -66,9 +19,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    final provider = context.watch<ProductProvider>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      provider.loadedProducts();
+    });
+
+    if (provider.isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -80,7 +40,10 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(onPressed: logout, icon: const Icon(Icons.logout)),
+          IconButton(
+            onPressed: () => _logout(context),
+            icon: const Icon(Icons.logout),
+          ),
         ],
       ),
       body: Column(
@@ -88,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.all(10),
             child: TextField(
-              controller: searchController,
+              controller: provider.searchController,
               decoration: InputDecoration(
                 labelText: 'Search products',
                 filled: true,
@@ -98,21 +61,21 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderSide: BorderSide.none,
                 ),
                 suffixIcon: IconButton(
-                  onPressed: searchProducts,
+                  onPressed: provider.searchProducts,
                   icon: const Icon(Icons.search),
                 ),
               ),
-              onSubmitted: (_) => searchProducts(),
+              onSubmitted: (_) => provider.searchProducts(),
             ),
           ),
           Expanded(
-            child: products.isEmpty
+            child: provider.products.isEmpty
                 ? const Center(child: Text('No products found'))
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    itemCount: products.length,
+                    itemCount: provider.products.length,
                     itemBuilder: (context, index) {
-                      final product = products[index];
+                      final product = provider.products[index];
                       final thumbnail = product['image'] as String?;
                       return Center(
                         child: Container(
@@ -240,9 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
             MaterialPageRoute(builder: (builder) => const ProductsScreen()),
           );
           if (newProduct != null) {
-            setState(() {
-              products.insert(0, newProduct);
-            });
+            context.read<ProductProvider>().addProduct(newProduct);
           }
         },
         child: const Icon(Icons.add),
